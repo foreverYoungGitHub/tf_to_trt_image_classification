@@ -157,7 +157,6 @@ class Logger : public ILogger
 
 int main(int argc, char * argv[])
 {
-
   if (argc != 15)
   {
     cout << TestConfig::UsageString() << endl;
@@ -167,12 +166,14 @@ int main(int argc, char * argv[])
   TestConfig testConfig(argc, argv); 
   cout << "\ntestConfig: \n" << testConfig.ToString() << endl;
 
-  size_t memoryBefore, memoryAfter;
+  size_t memoryBefore, memoryBetween, memoryAfter;
   memoryBefore = getUsedGpuMemory();
 
-  test(testConfig);
+  memoryBetween = test(testConfig);
 
   memoryAfter = getUsedGpuMemory();
+
+  std::cout << "GPU memory difference after inference: " << (((ssize_t) memoryBetween) - ((ssize_t) memoryBefore)) << " bytes" << std::endl;  
   if(memoryBefore != memoryAfter)
   {
     std::cout << "GPU memory difference detected: " << (((ssize_t) memoryAfter) - ((ssize_t) memoryBefore)) << " bytes" << std::endl;
@@ -287,8 +288,9 @@ static inline size_t getUsedGpuMemory(void)
   return used_byte;
 }
 
-void test(const TestConfig &testConfig)
+size_t test(const TestConfig &testConfig)
 {
+  size_t usedMemory;
   ifstream planFile(testConfig.planPath);
   stringstream planBuffer;
   planBuffer << planFile.rdbuf();
@@ -355,11 +357,12 @@ void test(const TestConfig &testConfig)
       diff = t1 - t0;
     }
 
-
     if (i != 0)
       avgTime += MS_PER_SEC * diff.count();
   }
   avgTime /= testConfig.NumRuns();
+
+  usedMemory = getUsedGpuMemory();
 
   // save results to file
   int maxCategoryIndex = argmax(output, testConfig.NumOutputCategories()) + 1001 - testConfig.NumOutputCategories();
@@ -389,4 +392,6 @@ void test(const TestConfig &testConfig)
   engine->destroy();
   context->destroy();
   runtime->destroy();
+
+  return usedMemory;
 }

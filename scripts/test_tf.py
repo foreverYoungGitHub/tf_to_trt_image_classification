@@ -12,7 +12,7 @@ import tensorflow as tf
 from model_meta import NETS, FROZEN_GRAPHS_DIR, CHECKPOINT_DIR
 import time
 import cv2
-
+import gc
 
 # TEST_IMAGE_PATH='data/images/gordon_setter.jpg'
 TEST_IMAGES_PATHS=['data/images/gordon_setter.jpg', 'data/images/lifeboat.jpg', 'data/images/golden_retriever.jpg']
@@ -24,7 +24,6 @@ if __name__ == '__main__':
 
     with open(TEST_OUTPUT_PATH, 'w') as test_f:
         for net_name, net_meta in NETS.items():
-
             if 'exclude' in net_meta.keys() and net_meta['exclude'] is True:
                 continue
 
@@ -67,4 +66,7 @@ if __name__ == '__main__':
                         top5 = net_meta['postprocess_fn'](output)
                         print(top5)
                         test_f.write("%s %s %s\n" % (net_name, TEST_IMAGE_PATH, avg_time))
+
+            # enforce garbage collector
+            gc.collect()
             
