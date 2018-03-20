@@ -264,11 +264,11 @@ static inline size_t getUsedGpuMemory(void)
     return 0;
   }
 
-  size_t used_byte = total - free_byte;
+  size_t used_byte = total_byte - free_byte;
 
-  std::cout << "GPU memory usage: used = " << (used_db/(1024.0f * 1024.0f))
-            << ", free = "  << (free_db/(1024.0f * 1024.0f)) << " MB"
-            << ", total = " << (total_db/(1024.0f * 1024.0f)) << " MB"
+  std::cout << "GPU memory usage: used = " << (used_byte/(1024.0f * 1024.0f))
+            << ", free = "  << (free_byte/(1024.0f * 1024.0f)) << " MB"
+            << ", total = " << (total_byte/(1024.0f * 1024.0f)) << " MB"
             << std::endl;
 
   return used_byte;
