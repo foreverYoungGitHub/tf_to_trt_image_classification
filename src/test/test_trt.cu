@@ -28,7 +28,7 @@ float * imageToTensor(const cv::Mat & image);
 void preprocessVgg(float *input, size_t channels, size_t height, size_t width);
 void preprocessInception(float *input, size_t channels, size_t height, size_t width);
 size_t argmax(float *input, size_t numel);
-void test(const TestConfig &testConfig);
+size_t test(const TestConfig &testConfig);
 static inline size_t getUsedGpuMemory(void);
 
 class TestConfig
