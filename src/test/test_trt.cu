@@ -167,7 +167,20 @@ int main(int argc, char * argv[])
   TestConfig testConfig(argc, argv); 
   cout << "\ntestConfig: \n" << testConfig.ToString() << endl;
 
+  size_t memoryBefore, memoryAfter;
+  memoryBefore = getUsedGpuMemory();
+
   test(testConfig);
+
+  memoryAfter = getUsedGpuMemory();
+  if(memoryBefore != memoryAfter)
+  {
+    std::cout << "GPU memory difference detected: " << (((ssize_t) memoryAfter) - ((ssize_t) memoryBefore)) << " bytes" << std::endl;
+  }
+  else
+  {
+    std::cout << "GPU memory cleaned up perfectly." << std::endl;
+  }
 
   return 0;
 }
@@ -276,9 +289,6 @@ static inline size_t getUsedGpuMemory(void)
 
 void test(const TestConfig &testConfig)
 {
-  size_t memoryBefore, memoryAfter;
-  memoryBefore = getUsedGpuMemory();
-
   ifstream planFile(testConfig.planPath);
   stringstream planBuffer;
   planBuffer << planFile.rdbuf();
@@ -379,14 +389,4 @@ void test(const TestConfig &testConfig)
   engine->destroy();
   context->destroy();
   runtime->destroy();
-
-  memoryAfter = getUsedGpuMemory();
-  if(memoryBefore != memoryAfter)
-  {
-    std::cout << "GPU memory difference detected: " << (((ssize_t) memoryAfter) - ((ssize_t) memoryBefore)) << " bytes" << std::endl;
-  }
-  else
-  {
-    std::cout << "GPU memory cleaned up perfectly." << std::endl;
-  }
 }
