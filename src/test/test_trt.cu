@@ -29,6 +29,7 @@ void preprocessVgg(float *input, size_t channels, size_t height, size_t width);
 void preprocessInception(float *input, size_t channels, size_t height, size_t width);
 size_t argmax(float *input, size_t numel);
 void test(const TestConfig &testConfig);
+static inline size_t getUsedGpuMemory(void);
 
 class TestConfig
 {
@@ -248,9 +249,36 @@ size_t argmax(float * tensor, size_t numel)
   return maxIndex;
 }
 
+static inline size_t getUsedGpuMemory(void)
+{
+  // taken & modified from:
+  // https://devtalk.nvidia.com/default/topic/974063/jetson-tx1/caffe-failed-with-py-faster-rcnn-demo-py-on-tx1/post/5013784/#5013784
+
+  size_t free_byte;
+  size_t total_byte;
+
+  cudaError_t cuda_status = cudaMemGetInfo( &free_byte, &total_byte ) ;
+
+  if ( cudaSuccess != cuda_status ){
+    std::cout << "Error: cudaMemGetInfo fails, " << cudaGetErrorString(cuda_status) << std::endl;
+    return 0;
+  }
+
+  size_t used_byte = total - free_byte;
+
+  std::cout << "GPU memory usage: used = " << (used_db/(1024.0f * 1024.0f))
+            << ", free = "  << (free_db/(1024.0f * 1024.0f)) << " MB"
+            << ", total = " << (total_db/(1024.0f * 1024.0f)) << " MB"
+            << std::endl;
+
+  return used_byte;
+}
 
 void test(const TestConfig &testConfig)
 {
+  size_t memoryBefore, memoryAfter;
+  memoryBefore = getUsedGpuMemory();
+
   ifstream planFile(testConfig.planPath);
   stringstream planBuffer;
   planBuffer << planFile.rdbuf();
@@ -329,16 +357,17 @@ void test(const TestConfig &testConfig)
   cout << "Average execution time in ms is " << avgTime << endl;
   ofstream outfile;
   outfile.open(testConfig.statsPath, ios_base::app);
-  outfile << "\n" << testConfig.planPath 
-    << " " << avgTime;
-    // << " " << maxCategoryIndex
-    // << " " << testConfig.InputWidth() 
-    // << " " << testConfig.InputHeight()
-    // << " " << testConfig.MaxBatchSize() 
-    // << " " << testConfig.WorkspaceSize() 
-    // << " " << testConfig.dataType 
-    // << " " << testConfig.NumRuns() 
-    // << " " << testConfig.UseMappedMemory();
+  outfile << testConfig.planPath
+          << " " << testConfig.imagePath
+          << " " << avgTime << std::endl;
+       // << " " << maxCategoryIndex
+       // << " " << testConfig.InputWidth() 
+       // << " " << testConfig.InputHeight()
+       // << " " << testConfig.MaxBatchSize() 
+       // << " " << testConfig.WorkspaceSize() 
+       // << " " << testConfig.dataType 
+       // << " " << testConfig.NumRuns() 
+       // << " " << testConfig.UseMappedMemory();
   outfile.close();
 
   cudaFree(inputDevice);
@@ -350,4 +379,14 @@ void test(const TestConfig &testConfig)
   engine->destroy();
   context->destroy();
   runtime->destroy();
+
+  memoryAfter = getUsedGpuMemory();
+  if(memoryBefore != memoryAfter)
+  {
+    std::cout << "GPU memory difference detected: " << (((ssize_t) memoryAfter) - ((ssize_t) memoryBefore)) << " bytes" << std::endl;
+  }
+  else
+  {
+    std::cout << "GPU memory cleaned up perfectly." << std::endl;
+  }
 }
