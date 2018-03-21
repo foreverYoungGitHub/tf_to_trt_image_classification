@@ -385,6 +385,4 @@ void test(const TestConfig &testConfig)
   engine->destroy();
   context->destroy();
   runtime->destroy();
-
-  return usedMemory;
 }
