@@ -28,7 +28,7 @@ float * imageToTensor(const cv::Mat & image);
 void preprocessVgg(float *input, size_t channels, size_t height, size_t width);
 void preprocessInception(float *input, size_t channels, size_t height, size_t width);
 size_t argmax(float *input, size_t numel);
-size_t test(const TestConfig &testConfig);
+void test(const TestConfig &testConfig);
 static inline size_t getUsedGpuMemory(void);
 
 class TestConfig
@@ -166,22 +166,7 @@ int main(int argc, char * argv[])
   TestConfig testConfig(argc, argv); 
   cout << "\ntestConfig: \n" << testConfig.ToString() << endl;
 
-  size_t memoryBefore, memoryBetween, memoryAfter;
-  memoryBefore = getUsedGpuMemory();
-
-  memoryBetween = test(testConfig);
-
-  memoryAfter = getUsedGpuMemory();
-
-  std::cout << "GPU memory difference after inference: " << (((ssize_t) memoryBetween) - ((ssize_t) memoryBefore)) << " bytes" << std::endl;  
-  if(memoryBefore != memoryAfter)
-  {
-    std::cout << "GPU memory difference detected: " << (((ssize_t) memoryAfter) - ((ssize_t) memoryBefore)) << " bytes" << std::endl;
-  }
-  else
-  {
-    std::cout << "GPU memory cleaned up perfectly." << std::endl;
-  }
+  test(testConfig);
 
   return 0;
 }
@@ -288,9 +273,11 @@ static inline size_t getUsedGpuMemory(void)
   return used_byte;
 }
 
-size_t test(const TestConfig &testConfig)
+void test(const TestConfig &testConfig)
 {
-  size_t usedMemory;
+  size_t memoryBefore, memoryBetween;
+  memoryBefore = getUsedGpuMemory();
+  
   ifstream planFile(testConfig.planPath);
   stringstream planBuffer;
   planBuffer << planFile.rdbuf();
@@ -362,17 +349,23 @@ size_t test(const TestConfig &testConfig)
   }
   avgTime /= testConfig.NumRuns();
 
-  usedMemory = getUsedGpuMemory();
+  memoryBetween = getUsedGpuMemory();
+  ssize_t memoryDiff = (((ssize_t) memoryBetween) - ((ssize_t) memoryBefore));
 
   // save results to file
   int maxCategoryIndex = argmax(output, testConfig.NumOutputCategories()) + 1001 - testConfig.NumOutputCategories();
   cout << "Most likely category id is " << maxCategoryIndex << endl;
   cout << "Average execution time in ms is " << avgTime << endl;
+  std::cout << "GPU memory difference after inference: " << memoryDiff << " bytes" << std::endl;  
+
   ofstream outfile;
   outfile.open(testConfig.statsPath, ios_base::app);
   outfile << testConfig.planPath
           << " " << testConfig.imagePath
-          << " " << avgTime << std::endl;
+          << " ms: " << avgTime
+          << " fps: " << (1000.0f / avgTime)
+          << " mem: " << memoryDiff
+          << std::endl;
        // << " " << maxCategoryIndex
        // << " " << testConfig.InputWidth() 
        // << " " << testConfig.InputHeight()

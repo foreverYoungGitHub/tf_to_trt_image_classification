@@ -29,12 +29,12 @@ if __name__ == '__main__':
 
             print("Testing %s" % net_name)
 
-            with open(net_meta['frozen_graph_filename'], 'rb') as f:
-                graph_def = tf.GraphDef()
-                graph_def.ParseFromString(f.read())
-
             with tf.Graph().as_default() as graph:
-                tf.import_graph_def(graph_def, name="")
+                with open(net_meta['frozen_graph_filename'], 'rb') as f:
+                    graph_def = tf.GraphDef()
+                    graph_def.ParseFromString(f.read())
+                    tf.import_graph_def(graph_def, name="")
+                    graph_def = None
             
                 tf_config = tf.ConfigProto()
                 tf_config.gpu_options.allow_growth = True
@@ -68,5 +68,6 @@ if __name__ == '__main__':
                         test_f.write("%s %s %s\n" % (net_name, TEST_IMAGE_PATH, avg_time))
 
             # enforce garbage collector
+            tf.reset_default_graph()
             gc.collect()
             
