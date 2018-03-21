@@ -13,7 +13,10 @@ import os
 
 
 if __name__ == '__main__':
-
+    datatype = 'half'
+    if len(sys.argv) > 1:
+        datatype = sys.argv[1]
+        
     if not os.path.exists('data/plans'):
         os.makedirs('data/plans')
 
@@ -32,5 +35,5 @@ if __name__ == '__main__':
             net_meta['output_names'][0],
             1, # batch size
             1 << 20, # workspace size
-            'half' # data type
+            datatype # data type
         )

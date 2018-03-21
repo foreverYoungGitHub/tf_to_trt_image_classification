@@ -15,6 +15,11 @@ TEST_OUTPUT_PATH='data/test_output_trt.csv'
 TEST_EXE_PATH='./build/src/test/test_trt'
 
 if __name__ == '__main__':
+    suffix = ''
+    if len(sys.argv) > 1:
+        TEST_OUTPUT_PATH = 'data/test_output_trt_%s.csv' % (sys.argv[1])
+        print("Outputting to: %s" % TEST_OUTPUT_PATH)
+    
     # delete output file 
     #if os.path.isfile(TEST_OUTPUT_PATH):
     #   os.remove(TEST_OUTPUT_PATH)
