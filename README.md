@@ -100,7 +100,6 @@ The inputs to the convert_plan.py script are
 
 This script assumes single output single input image models, and may not work out of the box for models other than those in the table above.
 
-<a name="execute"></a>
 ## Execute TensorRT engine
 
 Call the [examples/classify_image](examples/classify_image) program from the root directory of the project, referencing the models table for relevant parameters.  For example, to run the Inception V1 model converted as above
@@ -119,3 +118,16 @@ For reference, the inputs to the example program are
 6. preprocessing function (either vgg or inception)
 
 We provide two image label files in the [data folder](data/).  Some of the TensorFlow models were trained with an additional "background" class, causing the model to have 1001 outputs instead of 1000.  To determine the number of outputs for each model, reference the [NETS](scripts/model_meta.py#L67) variable in [scripts/model_meta.py](scripts/model_meta.py).
+
+## Ubuntu desktop setup
+
+```
+sudo dpkg -i cuda-repo-ubuntu1604_9.0.176-1_amd64.deb nv-tensorrt-repo-ubuntu1604-ga-cuda9.0-trt3.0.4-20180208_1-1_amd64.deb
+sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/7fa2af80.pub
+sudo apt-get update
+sudo apt-get install -y cuda-9.0
+sudo dpkg -i cuda-repo-ubuntu1604_9.0.176-1_amd64.deb libcudnn7-doc_7.1.1.5-1+cuda9.0_amd64.deb libcudnn7-dev_7.1.1.5-1+cuda9.0_amd64.deb libcudnn7_7.1.1.5-1+cuda9.0_amd64.deb nv-tensorrt-repo-ubuntu1604-ga-cuda9.0-trt3.0.4-20180208_1-1_amd64.deb
+sudo apt-get install tensorrt python-libnvinfer-doc python3-libnvinfer-doc uff-converter-tf
+# install tensorflow: https://www.tensorflow.org/install/install_sources
+```
+
