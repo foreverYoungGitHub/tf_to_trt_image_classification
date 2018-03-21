@@ -11,13 +11,15 @@ import pdb
 
 # TEST_IMAGE_PATH='data/images/gordon_setter.jpg'
 TEST_IMAGES_PATHS=['data/images/gordon_setter.jpg', 'data/images/lifeboat.jpg', 'data/images/golden_retriever.jpg']
-TEST_OUTPUT_PATH='data/test_output_trt.txt'
+TEST_OUTPUT_PATH='data/test_output_trt.csv'
 TEST_EXE_PATH='./build/src/test/test_trt'
 
 if __name__ == '__main__':
     # delete output file 
-    if os.path.isfile(TEST_OUTPUT_PATH):
-       os.remove(TEST_OUTPUT_PATH)
+    #if os.path.isfile(TEST_OUTPUT_PATH):
+    #   os.remove(TEST_OUTPUT_PATH)
+    with open(TEST_OUTPUT_PATH, 'w') as test_f:
+        print >>test_f, "Plan;File;AvgTimeMs;FPS;MemBytes"
 
     for net_name, net_meta in NETS.items():
         if 'exclude' in net_meta.keys() and net_meta['exclude'] is True:

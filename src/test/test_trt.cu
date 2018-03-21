@@ -361,6 +361,14 @@ void test(const TestConfig &testConfig)
   ofstream outfile;
   outfile.open(testConfig.statsPath, ios_base::app);
   outfile << testConfig.planPath
+          << ";" << testConfig.imagePath
+          << ";" << avgTime
+          << ";" << (1000.0f / avgTime)
+          << ";" << memoryDiff
+          << std::endl;
+  /*
+  outfile.open(testConfig.statsPath, ios_base::app);
+  outfile << testConfig.planPath
           << " " << testConfig.imagePath
           << " ms: " << avgTime
           << " fps: " << (1000.0f / avgTime)
@@ -374,6 +382,7 @@ void test(const TestConfig &testConfig)
        // << " " << testConfig.dataType 
        // << " " << testConfig.NumRuns() 
        // << " " << testConfig.UseMappedMemory();
+  */
   outfile.close();
 
   cudaFree(inputDevice);

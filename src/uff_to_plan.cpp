@@ -40,6 +40,8 @@ DataType toDataType(string value)
     return DataType::kFLOAT;
   else if (value == "half")
     return DataType::kHALF;
+  else if (value == "int8")
+    return DataType::kINT8;
   else
     throw runtime_error("Unsupported data type");
 }
@@ -82,6 +84,9 @@ int main(int argc, char *argv[])
   /* build engine */
   if (dataType == DataType::kHALF)
     builder->setHalf2Mode(true);
+  if (dataType == DataType::kINT8)
+    builder->setInt8Mode(true);
+    // TODO: calibration
 
   builder->setMaxBatchSize(maxBatchSize);
   builder->setMaxWorkspaceSize(maxWorkspaceSize);
