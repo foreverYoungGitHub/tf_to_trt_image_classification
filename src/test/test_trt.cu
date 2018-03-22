@@ -278,10 +278,18 @@ void test(const TestConfig &testConfig)
   size_t memoryBefore, memoryBetween;
   memoryBefore = getUsedGpuMemory();
   
+  // load image
+  cv::Mat image = cv::imread(testConfig.imagePath, CV_LOAD_IMAGE_COLOR);
+  cv::cvtColor(image, image, cv::COLOR_BGR2RGB, 3);
+  cv::resize(image, image, cv::Size(testConfig.InputWidth(), testConfig.InputHeight()));
+  float *input = imageToTensor(image);
+
   ifstream planFile(testConfig.planPath);
   stringstream planBuffer;
   planBuffer << planFile.rdbuf();
   string plan = planBuffer.str();
+
+  auto tl0 = chrono::steady_clock::now();
   IRuntime *runtime = createInferRuntime(gLogger);
   ICudaEngine *engine = runtime->deserializeCudaEngine((void*)plan.data(),
       plan.size(), nullptr);
@@ -291,11 +299,7 @@ void test(const TestConfig &testConfig)
   inputBindingIndex = engine->getBindingIndex(testConfig.inputNodeName.c_str());
   outputBindingIndex = engine->getBindingIndex(testConfig.outputNodeName.c_str());
 
-  // load and preprocess image
-  cv::Mat image = cv::imread(testConfig.imagePath, CV_LOAD_IMAGE_COLOR);
-  cv::cvtColor(image, image, cv::COLOR_BGR2RGB, 3);
-  cv::resize(image, image, cv::Size(testConfig.InputWidth(), testConfig.InputHeight()));
-  float *input = imageToTensor(image);
+  // preprocess image
   testConfig.PreprocessFn()(input, 3, testConfig.InputHeight(), testConfig.InputWidth());
 
   // allocate memory on host / device for input / output
@@ -316,6 +320,9 @@ void test(const TestConfig &testConfig)
     cudaMalloc(&inputDevice, inputSize);
     cudaMalloc(&outputDevice, testConfig.NumOutputCategories() * sizeof(float));
   }
+
+  auto tl1 = chrono::steady_clock::now();
+  double difftl = MS_PER_SEC * (tl1 - tl0).count();
 
   float *bindings[2];
   bindings[inputBindingIndex] = inputDevice;
@@ -365,6 +372,7 @@ void test(const TestConfig &testConfig)
           << ";" << avgTime
           << ";" << (1000.0f / avgTime)
           << ";" << memoryDiff
+          << ";" << difftl // est. cuda loading time
           << std::endl;
   /*
   outfile.open(testConfig.statsPath, ios_base::app);
