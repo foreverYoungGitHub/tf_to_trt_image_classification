@@ -14,10 +14,12 @@ TEST_OUTPUT_PATH='data/test_output_trt.csv'
 TEST_EXE_PATH='./build/src/test/test_trt'
 
 if __name__ == '__main__':
+    datatype = 'half'
     suffix = ''
     if len(sys.argv) > 1:
-        TEST_OUTPUT_PATH = 'data/test_output_trt_%s.csv' % (sys.argv[1])
-        suffix = "_" + sys.argv[1]
+        datatype = sys.argv[1]
+        TEST_OUTPUT_PATH = 'data/test_output_trt_%s.csv' % (datatype)
+        suffix = "_" + datatype
         print("Outputting to: %s" % TEST_OUTPUT_PATH)
     
     # delete output file 
@@ -41,7 +43,7 @@ if __name__ == '__main__':
                 str(net_meta['num_classes']), 
                 net_meta['preprocess_fn'].__name__,
                 str(50), # numRuns
-                "half", # dataType 
+                datatype, # dataType 
                 str(1), # maxBatchSize 
                 str(1 << 20), # workspaceSize 
                 str(0), # useMappedMemory 

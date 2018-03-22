@@ -135,6 +135,8 @@ public:
       return nvinfer1::DataType::kFLOAT;
     else if (dataType == "half")
       return nvinfer1::DataType::kHALF;
+    else if (dataType == "int8")
+      return nvinfer1::DataType::kINT8;
     else
       throw runtime_error("Invalid data type.");
   }
