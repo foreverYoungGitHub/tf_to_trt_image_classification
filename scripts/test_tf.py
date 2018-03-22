@@ -1,10 +1,11 @@
 from model_meta import NETS
-import os
+import os, sys
 import subprocess
 
 TEST_OUTPUT_PATH='data/test_output_tf.csv'
 PYTHON='/usr/bin/python'
-TEST_SCRIPT=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'scripts', 'test_run_tf.py')
+TEST_SCRIPT=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test_run_tf.py')
+TEST_IMAGES_PATHS=['data/images/gordon_setter.jpg', 'data/images/lifeboat.jpg', 'data/images/golden_retriever.jpg']
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:

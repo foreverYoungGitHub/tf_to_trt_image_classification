@@ -14,9 +14,6 @@ import time
 import cv2
 import gc
 
-# TEST_IMAGE_PATH='data/images/gordon_setter.jpg'
-TEST_IMAGES_PATHS=['data/images/gordon_setter.jpg', 'data/images/lifeboat.jpg', 'data/images/golden_retriever.jpg']
-
 NUM_RUNS=50
 
 if __name__ == '__main__':
