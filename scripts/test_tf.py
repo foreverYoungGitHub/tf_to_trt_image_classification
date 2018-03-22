@@ -4,8 +4,10 @@ import subprocess
 
 TEST_OUTPUT_PATH='data/test_output_tf.csv'
 PYTHON='/usr/bin/python'
-TEST_SCRIPT=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test_run_tf.py')
+FILE_PATH=os.path.dirname(os.path.abspath(__file__))
+TEST_SCRIPT=os.path.join(FILE_PATH, 'test_run_tf.py')
 TEST_IMAGES_PATHS=['data/images/gordon_setter.jpg', 'data/images/lifeboat.jpg', 'data/images/golden_retriever.jpg']
+TEST_IMAGES_PATHS_FULL=[os.path.join(FILE_PATH, '..', p) for p in TEST_IMAGES_PATHS]
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
@@ -19,7 +21,7 @@ if __name__ == '__main__':
         if 'exclude' in net_meta.keys() and net_meta['exclude'] is True:
             continue
 
-        for TEST_IMAGE_PATH in TEST_IMAGES_PATHS:
+        for TEST_IMAGE_PATH in TEST_IMAGES_PATHS_FULL:
             args = [
                 net_name,
                 TEST_IMAGE_PATH,

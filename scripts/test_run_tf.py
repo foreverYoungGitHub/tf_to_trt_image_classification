@@ -18,9 +18,9 @@ NUM_RUNS=50
 
 if __name__ == '__main__':
     net_name = sys.argv[1]
-    output_path = sys.argv[2]
-    TEST_IMAGE_PATH = sys.argv[3]
-    net_meta in NETS[net]
+    TEST_IMAGE_PATH = sys.argv[2]
+    output_path = sys.argv[3]
+    net_meta = NETS[net_name]
 
     with open(output_path, 'a') as test_f:
         print("Testing %s" % net_name)
