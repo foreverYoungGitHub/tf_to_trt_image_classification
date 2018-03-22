@@ -17,6 +17,7 @@ if __name__ == '__main__':
     suffix = ''
     if len(sys.argv) > 1:
         TEST_OUTPUT_PATH = 'data/test_output_trt_%s.csv' % (sys.argv[1])
+        suffix = "_" + sys.argv[1]
         print("Outputting to: %s" % TEST_OUTPUT_PATH)
     
     # delete output file 
@@ -32,7 +33,7 @@ if __name__ == '__main__':
         for TEST_IMAGE_PATH in TEST_IMAGES_PATHS:
             args = [
                 TEST_IMAGE_PATH,
-                net_meta['plan_filename'],
+                net_meta['plan_filename'] + suffix,
                 net_meta['input_name'],
                 str(net_meta['input_height']),
                 str(net_meta['input_width']),

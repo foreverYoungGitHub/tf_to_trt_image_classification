@@ -10,25 +10,24 @@ from model_meta import NETS, FROZEN_GRAPHS_DIR, CHECKPOINT_DIR, PLAN_DIR
 from convert_plan import frozenToPlan
 import os
 
-
-
 if __name__ == '__main__':
     datatype = 'half'
+    suffix = ''
     if len(sys.argv) > 1:
+        suffix = "_" + sys.argv[1]
         datatype = sys.argv[1]
         
     if not os.path.exists('data/plans'):
         os.makedirs('data/plans')
 
     for net_name, net_meta in NETS.items():
-        
         if 'exclude' in net_meta.keys() and net_meta['exclude'] is True:
             continue
 
         print("Convertings %s to PLAN" % net_name)
          
         frozenToPlan(net_meta['frozen_graph_filename'],
-            net_meta['plan_filename'],
+            net_meta['plan_filename'] + suffix,
             net_meta['input_name'],
             net_meta['input_height'],
             net_meta['input_width'],
