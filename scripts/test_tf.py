@@ -66,6 +66,7 @@ if __name__ == '__main__':
                         top5 = net_meta['postprocess_fn'](output)
                         print(top5)
                         test_f.write("%s %s %s\n" % (net_name, TEST_IMAGE_PATH, avg_time))
+                        test_f.flush() # cause of memory leaks no file is written
 
             # enforce garbage collector
             tf.reset_default_graph()
