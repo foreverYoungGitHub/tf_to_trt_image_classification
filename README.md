@@ -119,6 +119,35 @@ For reference, the inputs to the example program are
 
 We provide two image label files in the [data folder](data/).  Some of the TensorFlow models were trained with an additional "background" class, causing the model to have 1001 outputs instead of 1000.  To determine the number of outputs for each model, reference the [NETS](scripts/model_meta.py#L67) variable in [scripts/model_meta.py](scripts/model_meta.py).
 
+## Jetson build Tensorflow from source
+
+```
+# prerequisits
+sudo apt-get install -y openjdk-8-jdk zip unzip autoconf automake libtool curl python-numpy swig python-dev python-pip python-six python-wheel build-essential
+
+# bazel
+mkdir bazel
+wget --no-check-certificate https://github.com/bazelbuild/bazel/releases/download/0.11.1/bazel-0.11.1-dist.zip
+unzip bazel-0.11.1-dist.zip -d bazel-0.11.1-dist
+cd bazel-0.11.1-dist
+./compile.sh
+sudo cp output/bazel /usr/local/bin
+cd ../..
+
+# tensorflow
+git clone https://github.com/tensorflow/tensorflow
+cd tensorflow
+git checkout r1.7
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64
+# checkout tensorrt_configure from current master branch because r1.7 didn't have the aarch64 switch
+git checkout master -- third_party/tensorrt/tensorrt_configure.bzl
+TF_NEED_KAFKA=0 TF_NEED_GCP=0 TF_NEED_OPENCL=0 TF_NEED_S3=0 TF_NEED_GCP=0 TF_NEED_HDFS=0 TF_NEED_CUDA=1 TF_CUDA_VERSION=9.0 CUDA_TOOLKIT_PATH=/usr/local/cuda TF_CUDNN_VERSION=7.0.5 CUDNN_INSTALL_PATH=/usr/lib/aarch64-linux-gnu/ TF_CUDA_COMPUTE_CAPABILITIES=6.2 CC_OPT_FLAGS=-march=native TF_NEED_JEMALLOC=1 TF_NEED_OPENCL=0 TF_ENABLE_XLA=0 TF_NEED_MKL=0 TF_NEED_MPI=0 TF_NEED_VERBS=0 TF_CUDA_CLANG=0 TF_NEED_TENSORRT=1 TENSORRT_INSTALL_PATH=/usr/lib/aarch64-linux-gnu ./configure
+# press enter some times
+bazel build --config=opt --config=cuda //tensorflow/tools/pip_package:build_pip_package
+bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
+sudo pip install /tmp/tensorflow_pkg/tensorflow-1.7.0rc1-cp27-cp27mu-linux_aarch64.whl
+```
+
 ## Ubuntu desktop setup
 
 ```
@@ -130,4 +159,3 @@ sudo dpkg -i cuda-repo-ubuntu1604_9.0.176-1_amd64.deb libcudnn7-doc_7.1.1.5-1+cu
 sudo apt-get install tensorrt python-libnvinfer-doc python3-libnvinfer-doc uff-converter-tf
 # install tensorflow: https://www.tensorflow.org/install/install_sources
 ```
-
