@@ -7,7 +7,6 @@ import sys
 from model_meta import NETS
 import os
 import subprocess
-import pdb
 
 # TEST_IMAGE_PATH='data/images/gordon_setter.jpg'
 TEST_IMAGES_PATHS=['data/images/gordon_setter.jpg', 'data/images/lifeboat.jpg', 'data/images/golden_retriever.jpg']
