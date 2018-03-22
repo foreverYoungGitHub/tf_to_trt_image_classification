@@ -17,13 +17,12 @@ import gc
 NUM_RUNS=50
 
 if __name__ == '__main__':
-    net = sys.argv[1]
+    net_name = sys.argv[1]
     output_path = sys.argv[2]
     TEST_IMAGE_PATH = sys.argv[3]
-    net_name, net_meta in NETS[net]
+    net_meta in NETS[net]
 
     with open(output_path, 'a') as test_f:
-
         print("Testing %s" % net_name)
 
         with tf.Graph().as_default() as graph:
