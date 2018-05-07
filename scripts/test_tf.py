@@ -15,7 +15,7 @@ if __name__ == '__main__':
         print("Outputting to: %s" % TEST_OUTPUT_PATH)
 
     with open(TEST_OUTPUT_PATH, 'w') as test_f:
-        print >>test_f, "Plan;File;AvgTimeMs;FPS;MemBytes;InitGraph"
+        test_f.write("Plan;File;AvgTimeMs;FPS;MemBytes;InitGraph\n")
         
     for net_name, net_meta in NETS.items():
         if 'exclude' in net_meta.keys() and net_meta['exclude'] is True:
